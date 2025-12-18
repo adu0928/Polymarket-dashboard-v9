@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "functions": {
+    "api/lookup.js": {
+      "maxDuration": 60
+    },
+    "api/markets.js": {
+      "maxDuration": 30
+    }
+  }
+}

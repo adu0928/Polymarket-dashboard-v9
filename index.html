@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F04-大大大大大大</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        html{zoom:1.2}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%);min-height:100vh;color:#fff}
+        .container{max-width:1600px;margin:0 auto;padding:15px}
+        .header{position:sticky;top:0;z-index:100;background:rgba(15,23,42,0.95);backdrop-filter:blur(10px);border-bottom:1px solid rgba(55,65,81,0.3);padding:12px 0;margin-bottom:15px}
+        .header-content{max-width:1600px;margin:0 auto;padding:0 15px}
+        .header-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+        .logo{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#06b6d4,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:18px}
+        .title{font-size:20px;font-weight:700;background:linear-gradient(135deg,#06b6d4,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .subtitle{font-size:10px;color:#6b7280}
+        .status-badge{margin-left:auto;display:flex;align-items:center;gap:5px}
+        .status-dot{width:8px;height:8px;border-radius:50%}
+        .status-dot.loading{background:#f59e0b;animation:pulse 1s infinite}
+        .status-dot.online{background:#10b981}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+        .status-text{font-size:10px;color:#9ca3af}
+        .tabs{display:flex;gap:4px;flex-wrap:wrap}
+        .tab{padding:8px 16px;font-size:13px;font-weight:500;border-radius:6px;border:none;cursor:pointer;background:transparent;color:#9ca3af;transition:all 0.2s}
+        .tab:hover{background:rgba(31,41,55,0.5)}
+        .tab.active{background:#1f2937;color:#06b6d4}
+        .tab-content{display:none}
+        .tab-content.active{display:block}
+        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:15px}
+        .stat-card{background:linear-gradient(135deg,rgba(6,182,212,0.1),rgba(17,24,39,0.8));border:1px solid rgba(6,182,212,0.3);border-radius:10px;padding:14px}
+        .stat-card.purple{background:linear-gradient(135deg,rgba(139,92,246,0.1),rgba(17,24,39,0.8));border-color:rgba(139,92,246,0.3)}
+        .stat-card.green{background:linear-gradient(135deg,rgba(16,185,129,0.1),rgba(17,24,39,0.8));border-color:rgba(16,185,129,0.3)}
+        .stat-card.orange{background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(17,24,39,0.8));border-color:rgba(245,158,11,0.3)}
+        .stat-card.pink{background:linear-gradient(135deg,rgba(236,72,153,0.1),rgba(17,24,39,0.8));border-color:rgba(236,72,153,0.3)}
+        .stat-card.blue{background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(17,24,39,0.8));border-color:rgba(59,130,246,0.3)}
+        .stat-label{color:#9ca3af;font-size:9px;text-transform:uppercase;margin-bottom:4px}
+        .stat-value{color:#fff;font-size:16px;font-weight:700;font-family:monospace}
+        .stat-sub{color:#6b7280;font-size:8px;margin-top:3px}
+        .section{background:rgba(17,24,39,0.6);border:1px solid rgba(55,65,81,0.5);border-radius:10px;padding:14px;margin-bottom:12px}
+        .section-title{color:#fff;font-size:13px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+        .bar-chart{display:flex;flex-direction:column;gap:5px}
+        .bar-item{display:flex;align-items:center;gap:6px}
+        .bar-label{color:#9ca3af;font-size:10px;min-width:90px}
+        .bar-container{flex:1;height:18px;background:rgba(55,65,81,0.3);border-radius:4px;overflow:hidden}
+        .bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:5px;min-width:24px}
+        .bar-pct{color:#fff;font-size:9px;font-weight:600}
+        .bar-value{color:#fff;font-size:10px;font-family:monospace;min-width:80px;text-align:right}
+        .h-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px}
+        .h-stat{background:rgba(31,41,55,0.5);border-radius:6px;padding:10px;text-align:center}
+        .h-stat-label{color:#6b7280;font-size:9px;margin-bottom:3px}
+        .h-stat-value{color:#fff;font-size:13px;font-weight:600;font-family:monospace}
+        .h-stat-value.green{color:#10b981}
+        .h-stat-value.red{color:#ef4444}
+        .table-container{background:rgba(17,24,39,0.6);border:1px solid rgba(55,65,81,0.5);border-radius:10px;overflow:hidden}
+        .table-scroll{overflow-x:auto;max-height:520px;overflow-y:auto}
+        table{width:100%;border-collapse:collapse;min-width:1050px}
+        th{position:sticky;top:0;text-align:left;color:#9ca3af;font-size:10px;font-weight:500;padding:10px 6px;background:rgba(31,41,55,0.98);text-transform:uppercase;z-index:10}
+        th.right{text-align:right}
+        td{padding:8px 6px;border-top:1px solid rgba(55,65,81,0.3);font-size:11px}
+        tr:hover{background:rgba(31,41,55,0.3)}
+        .market-title{display:flex;align-items:center;gap:5px;max-width:260px}
+        .market-icon{font-size:11px}
+        .market-name{color:#fff;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:none}
+        .market-name:hover{color:#06b6d4;text-decoration:underline}
+        .cat-tag{font-size:9px;padding:3px 6px;border-radius:4px}
+        .cat-tag.Politics{background:rgba(139,92,246,0.2);color:#a78bfa}
+        .cat-tag.Crypto{background:rgba(245,158,11,0.2);color:#fbbf24}
+        .cat-tag.Sports{background:rgba(16,185,129,0.2);color:#34d399}
+        .cat-tag.Business{background:rgba(59,130,246,0.2);color:#60a5fa}
+        .cat-tag.Science{background:rgba(236,72,153,0.2);color:#f472b6}
+        .cat-tag.Entertainment{background:rgba(6,182,212,0.2);color:#22d3ee}
+        .cat-tag.Other{background:rgba(107,114,128,0.2);color:#9ca3af}
+        .spread{font-family:monospace;font-size:10px;padding:3px 6px;border-radius:4px}
+        .spread.profit{background:rgba(16,185,129,0.2);color:#10b981}
+        .spread.zero{background:rgba(107,114,128,0.15);color:#9ca3af}
+        .spread.low{background:rgba(245,158,11,0.2);color:#f59e0b}
+        .spread.high{background:rgba(239,68,68,0.2);color:#ef4444}
+        .mono{font-family:monospace;font-size:10px;color:#d1d5db;text-align:right}
+        .status-tag{font-size:9px;padding:3px 6px;border-radius:4px}
+        .status-tag.active{background:rgba(16,185,129,0.15);color:#10b981}
+        .status-tag.ended{background:rgba(107,114,128,0.2);color:#9ca3af}
+        .filters{background:rgba(17,24,39,0.6);border:1px solid rgba(55,65,81,0.5);border-radius:10px;padding:12px;margin-bottom:12px}
+        .filters-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+        .filter-group label{display:block;color:#9ca3af;font-size:9px;margin-bottom:4px}
+        .filter-group select,.filter-group input{width:100%;background:#1f2937;border:1px solid #374151;border-radius:5px;padding:7px;color:#fff;font-size:11px;outline:none}
+        .results-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+        .results-count{color:#9ca3af;font-size:12px}
+        .results-count span{color:#06b6d4;font-weight:600}
+        .refresh-btn{padding:6px 14px;background:#1f2937;border:1px solid #374151;border-radius:5px;color:#9ca3af;font-size:11px;cursor:pointer}
+        .lookup-container{background:rgba(17,24,39,0.6);border:1px solid rgba(55,65,81,0.5);border-radius:10px;padding:18px}
+        .lookup-form{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+        .lookup-input{flex:1;min-width:280px;background:#1f2937;border:1px solid #374151;border-radius:8px;padding:12px;color:#fff;font-size:12px;font-family:monospace;outline:none}
+        .lookup-btn{padding:12px 20px;background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+        .info-box{padding:12px;border-radius:8px;margin-bottom:14px;font-size:11px}
+        .info-box.info{background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.3);color:#06b6d4}
+        .info-box.success{background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);color:#10b981}
+        .info-box.warning{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);color:#f59e0b}
+        .info-box a{color:#06b6d4}
+        .user-header{display:flex;align-items:center;gap:12px;padding:12px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.2);border-radius:8px;margin-bottom:14px;flex-wrap:wrap}
+        .user-avatar{font-size:20px}
+        .user-address{color:#fff;font-size:11px;font-family:monospace;word-break:break-all}
+        .user-links{margin-left:auto;display:flex;gap:8px}
+        .user-links a{color:#06b6d4;font-size:10px;text-decoration:none;padding:5px 10px;background:rgba(6,182,212,0.1);border-radius:5px}
+        .user-stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+        .user-stat-card{background:rgba(31,41,55,0.5);border-radius:8px;padding:12px}
+        .user-stat-label{color:#9ca3af;font-size:9px;margin-bottom:3px}
+        .user-stat-value{font-size:15px;font-weight:700;font-family:monospace}
+        .history-section{background:rgba(31,41,55,0.3);border-radius:8px;padding:12px;margin-top:14px;max-height:400px;overflow-y:auto}
+        .history-title{color:#9ca3af;font-size:11px;margin-bottom:10px;display:flex;justify-content:space-between}
+        .history-item{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(55,65,81,0.3);font-size:10px}
+        .history-type{padding:3px 8px;border-radius:4px;font-size:9px;min-width:36px;text-align:center}
+        .history-type.buy{background:rgba(16,185,129,0.15);color:#10b981}
+        .history-type.sell{background:rgba(239,68,68,0.15);color:#ef4444}
+        .history-type.trade{background:rgba(107,114,128,0.15);color:#9ca3af}
+        .history-market{color:#fff;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .history-amount{color:#d1d5db;font-family:monospace;min-width:60px;text-align:right}
+        .history-date{color:#6b7280;font-size:9px;min-width:90px;text-align:right}
+        .position-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(55,65,81,0.3)}
+        .position-outcome{font-size:8px;padding:3px 6px;border-radius:4px}
+        .position-outcome.yes{background:rgba(16,185,129,0.15);color:#10b981}
+        .position-outcome.no{background:rgba(239,68,68,0.15);color:#ef4444}
+        .position-market{color:#fff;font-size:10px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .position-data{display:flex;gap:10px}
+        .position-val{font-size:9px;font-family:monospace;min-width:50px;text-align:right}
+        .loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.9);display:flex;align-items:center;justify-content:center;z-index:1000}
+        .loading-spinner{width:40px;height:40px;border:3px solid rgba(6,182,212,0.3);border-top-color:#06b6d4;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .loading-text{color:#9ca3af;font-size:13px;text-align:center}
+        .pagination{display:flex;justify-content:center;gap:5px;margin-top:12px}
+        .pagination button{padding:6px 12px;background:#1f2937;border:1px solid #374151;border-radius:5px;color:#fff;font-size:11px;cursor:pointer}
+        .pagination button.active{background:#06b6d4;border-color:#06b6d4}
+        .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-radius:50%;border-top-color:#fff;animation:spin 1s linear infinite;margin-right:6px}
+        .lp-table{width:100%;border-collapse:collapse}
+        .lp-table th,.lp-table td{padding:10px;text-align:left;border-bottom:1px solid rgba(55,65,81,0.3)}
+        .lp-table th{background:rgba(31,41,55,0.5);color:#9ca3af;font-size:10px}
+        .lp-table td{font-size:11px}
+        .lp-rank{color:#f59e0b;font-weight:600}
+        .lp-address{font-family:monospace;color:#06b6d4;font-size:10px}
+        .lp-address:hover{text-decoration:underline}
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loading"><div><div class="loading-spinner"></div><div class="loading-text">正在加载...</div></div></div>
+    <header class="header"><div class="header-content">
+        <div class="header-top">
+            <div class="logo">🌐</div>
+            <div><h1 class="title">F04-大大大大大大</h1><p class="subtitle">polymarket.com · polygonscan.com</p></div>
+            <div class="status-badge"><div class="status-dot loading" id="status-dot"></div><span class="status-text" id="status-text">加载中...</span></div>
+        </div>
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('overview')">📊 总览</button>
+            <button class="tab" onclick="showTab('markets')">🎯 市场列表</button>
+            <button class="tab" onclick="showTab('lprewards')">💎 LP流动性奖励</button>
+            <button class="tab" onclick="showTab('users')">👥 用户分析</button>
+            <button class="tab" onclick="showTab('address')">🔍 地址查询</button>
+        </div>
+    </div></header>
+    <div class="container">
+        <div id="overview" class="tab-content active"></div>
+        <div id="markets" class="tab-content"></div>
+        <div id="lprewards" class="tab-content"></div>
+        <div id="users" class="tab-content"></div>
+        <div id="address" class="tab-content"></div>
+    </div>
+<script>
+let allMarkets=[],filteredMarkets=[],marketStats={},page=1;
+const pageSize=30;
+const fmt=n=>isNaN(n)?'0':Math.floor(n).toLocaleString();
+const fmtUSD=n=>'$'+fmt(n);
+const fmtPct=(n,d=1)=>n.toFixed(d)+'%';
+const fmtDate=d=>d?new Date(d).toLocaleDateString('zh-CN'):'-';
+const fmtTime=d=>d?new Date(d).toLocaleString('zh-CN'):'-';
+const getIcon=c=>({Politics:'🏛️',Crypto:'₿',Sports:'⚽',Business:'💼',Entertainment:'🎬',Science:'🔬',Other:'🔮'}[c]||'🔮');
+const colors=['#06b6d4','#8b5cf6','#10b981','#f59e0b','#ec4899','#3b82f6','#6b7280'];
+
+// ============ 配置：修改这里的服务器地址 ============
+const DATA_SERVER = 'http://43.173.167.251:3000'; // 改成你的腾讯云服务器IP
+// ===================================================
+
+// 平台数据（会从服务器自动更新）
+let P={
+    tvl:291790000,
+    tpv:520000000,
+    totalVolume:22048000000,
+    volume24h:171680000,
+    totalUsers:1700000,
+    monthlyActive:314500,
+    weeklyActive:150000,
+    dailyActive:50000,
+    totalTrades:89500000
+};
+
+// LP奖励数据（会从服务器自动更新）
+let LP={
+    daily:35000,
+    weekly:245000,
+    monthly:1050000,
+    cumulative:12500000,
+    leaderboard:[
+        {rank:1,address:'0x9d84ce0306f8551e02efef1680475fc0f1dc1344',usdc:1250000},
+        {rank:2,address:'0x1cfc260bfa2b5ae89377863180ca3b4f5c862111',usdc:381590},
+        {rank:3,address:'0x7789806c754eb0af4c3abeb026c218b4ba78f823',usdc:353590},
+        {rank:4,address:'0xc0ab97a9089a9ff7e6ef0688e6e591a066946418',usdc:304380},
+        {rank:5,address:'0x3cf3e8d5427aed066a7a592698060f6c3cf87b3',usdc:296190},
+        {rank:6,address:'0x4cc3522b689a6bf1fb4a2444c523e7776db47552',usdc:255790},
+        {rank:7,address:'0x6b7ec4ba079c0a258435ea36025f6190cd424562',usdc:223280},
+        {rank:8,address:'0x96b59f71f635da5da031e3e93448c54fe226f5e7',usdc:212830},
+        {rank:9,address:'0xa3e22cd32aa9238ef7dbcfb4761e33b0eaa1fdf8',usdc:206110},
+        {rank:10,address:'0xd42f6a1634a3707e27cbae14ca966068e5d1047d',usdc:175580}
+    ]
+};
+
+// 从服务器获取平台数据（可选）
+async function fetchPlatformData(){
+    // 如果服务器地址没配置，直接跳过
+    if (!DATA_SERVER || DATA_SERVER.includes('YOUR_SERVER_IP')) {
+        console.log('⚠️ 数据服务器未配置，使用本地数据');
+        return false;
+    }
+    
+    try{
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5秒超时
+        
+        const res=await fetch(`${DATA_SERVER}/api/platform`, {
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        
+        const data=await res.json();
+        if(data.success && data.data){
+            const d=data.data;
+            // 更新平台数据
+            if(d.platform){
+                P.tvl=d.platform.tvl||P.tvl;
+                P.tpv=d.platform.tpv||P.tpv;
+                P.totalVolume=d.platform.totalVolume||P.totalVolume;
+                P.volume24h=d.platform.volume24h||P.volume24h;
+                P.totalUsers=d.platform.totalUsers||P.totalUsers;
+                P.monthlyActive=d.platform.monthlyActive||P.monthlyActive;
+                P.weeklyActive=d.platform.weeklyActive||P.weeklyActive;
+                P.dailyActive=d.platform.dailyActive||P.dailyActive;
+                P.totalTrades=d.platform.totalTrades||P.totalTrades;
+            }
+            // 更新LP数据
+            if(d.lpRewards){
+                LP.daily=d.lpRewards.daily||LP.daily;
+                LP.weekly=d.lpRewards.weekly||LP.weekly;
+                LP.monthly=d.lpRewards.monthly||LP.monthly;
+                LP.cumulative=d.lpRewards.cumulative||LP.cumulative;
+                if(d.lpRewards.leaderboard&&d.lpRewards.leaderboard.length>0){
+                    LP.leaderboard=d.lpRewards.leaderboard;
+                }
+            }
+            // 更新用户分布
+            if(d.userDistribution){
+                if(d.userDistribution.tvlDist)TVL_DIST=d.userDistribution.tvlDist.map((x,i)=>({r:x.range,u:x.users,p:x.pct}));
+                if(d.userDistribution.volumeDist)VOL_DIST=d.userDistribution.volumeDist.map((x,i)=>({r:x.range,u:x.users,p:x.pct}));
+                if(d.userDistribution.pnlDist)PNL_DIST=d.userDistribution.pnlDist;
+            }
+            // 更新分类成交量
+            if(d.categoryVolume){
+                CATEGORY_VOLUME=d.categoryVolume;
+            }
+            console.log('✅ 平台数据已从服务器更新',d.lastUpdate);
+            return true;
+        }
+    }catch(e){
+        console.log('⚠️ 数据服务器连接失败，使用本地数据');
+    }
+    return false;
+}
+
+// 分类成交量数据（会从服务器自动更新）
+let CATEGORY_VOLUME = {
+    'Politics': { volume: 8500000000, markets: 156, name: '政治' },
+    'Sports': { volume: 5200000000, markets: 423, name: '体育' },
+    'Crypto': { volume: 3800000000, markets: 289, name: '加密货币' },
+    'Business': { volume: 1500000000, markets: 87, name: '商业' },
+    'Tech': { volume: 1200000000, markets: 95, name: '科技' },
+    'Entertainment': { volume: 800000000, markets: 134, name: '娱乐' },
+    'Other': { volume: 1048000000, markets: 245, name: '其他' }
+};
+
+// 用户盈亏分布（会从服务器自动更新）
+let PNL_DIST = [
+    {range:'亏损>50%',pct:20},
+    {range:'亏损10-50%',pct:31},
+    {range:'亏损0-10%',pct:36},
+    {range:'盈利0-10%',pct:7},
+    {range:'盈利10-50%',pct:4},
+    {range:'盈利>50%',pct:2}
+];
+
+// 用户成交额分布（会从服务器自动更新）
+let VOL_DIST=[
+    {r:'$0-$10',u:380000,p:22.4},
+    {r:'$10-$50',u:320000,p:18.8},
+    {r:'$50-$100',u:220000,p:12.9},
+    {r:'$100-$250',u:190000,p:11.2},
+    {r:'$250-$500',u:150000,p:8.8},
+    {r:'$500-$1K',u:130000,p:7.6},
+    {r:'$1K-$5K',u:95000,p:5.6},
+    {r:'$5K+',u:75000,p:4.4}
+];
+
+// 用户余额TVL分布（会从服务器自动更新）
+let TVL_DIST=[
+    {r:'$0',u:1100000,p:64.7},
+    {r:'$1-$100',u:450000,p:26.5},
+    {r:'$100-$1K',u:120000,p:7.1},
+    {r:'$1K-$10K',u:25000,p:1.5},
+    {r:'$10K-$100K',u:4500,p:0.26},
+    {r:'$100K+',u:500,p:0.03}
+];
+
+const U={
+    betDist:[{r:'1-5次',p:38.5},{r:'6-20次',p:26.2},{r:'21-50次',p:16.8},{r:'51-100次',p:9.3},{r:'101-500次',p:6.5},{r:'500+次',p:2.7}],
+    daysDist:[{r:'1天',p:32.1},{r:'2-7天',p:27.5},{r:'8-30天',p:19.2},{r:'31-90天',p:12.8},{r:'91-180天',p:5.6},{r:'180+天',p:2.8}],
+    positionDist:[{r:'$0',p:35.2},{r:'$1-$100',p:32.8},{r:'$100-$1K',p:18.5},{r:'$1K-$10K',p:9.8},{r:'$10K-$100K',p:3.1},{r:'$100K+',p:0.6}],
+    pnlDist:[{r:'亏损>50%',p:20,c:'#ef4444'},{r:'亏损10-50%',p:31,c:'#f87171'},{r:'亏损0-10%',p:36,c:'#fca5a5'},{r:'盈利0-10%',p:7,c:'#86efac'},{r:'盈利10-50%',p:4,c:'#34d399'},{r:'盈利>50%',p:2,c:'#10b981'}]
+};
+
+async function loadData(silent = false){
+    const loadingEl = document.getElementById('loading');
+    if (loadingEl && !silent) loadingEl.style.display='flex';
+    
+    try{
+        // 1. 尝试从数据服务器获取（可选，失败不影响）
+        await fetchPlatformData().catch(e => console.log('数据服务器未连接，使用本地数据'));
+        
+        // 2. 从Polymarket API获取市场数据
+        const res=await fetch('/api/markets');
+        if(!res.ok)throw new Error(`API ${res.status}`);
+        const data=await res.json();
+        if(!data.success)throw new Error(data.error);
+        allMarkets=data.markets;
+        marketStats=data.stats;
+        
+        // 3. 渲染页面
+        renderOverview();
+        renderMarkets();
+        renderLPRewards();
+        renderUsers();
+        renderAddress();
+        
+        const statusDot = document.getElementById('status-dot');
+        const statusText = document.getElementById('status-text');
+        if(statusDot) statusDot.className='status-dot online';
+        if(statusText) statusText.textContent=`${allMarkets.length} 个市场`;
+    }catch(e){
+        console.error('加载失败:', e);
+        const statusDot = document.getElementById('status-dot');
+        const overviewEl = document.getElementById('overview');
+        if(statusDot){
+            statusDot.className='status-dot';
+            statusDot.style.background='#ef4444';
+        }
+        if(overviewEl && !silent){
+            overviewEl.innerHTML=`<div class="info-box warning">❌ ${e.message}</div>`;
+        }
+    }
+    if (loadingEl) loadingEl.style.display='none';
+}
+
+function renderBar(data,maxPct){
+    const max=maxPct||Math.max(...data.map(d=>d.p),1);
+    return data.map((d,i)=>`<div class="bar-item"><span class="bar-label">${d.l}</span><div class="bar-container"><div class="bar-fill" style="width:${Math.max(d.p/max*100,5)}%;background:${d.c||colors[i%7]}"><span class="bar-pct">${fmtPct(d.p)}</span></div></div><span class="bar-value">${d.v}</span></div>`).join('');
+}
+
+function renderOverview(){
+    const S=marketStats;
+    // 使用API返回的实时TVL（如果有的话）
+    const tvl=S.tvl||P.tvl;
+    const tvlChange=S.tvlChange24h||0;
+    
+    // 优先使用服务器的分类数据，没有则用API数据
+    let cats;
+    if(CATEGORY_VOLUME && Object.keys(CATEGORY_VOLUME).length > 0){
+        // 从服务器获取的分类数据
+        cats = Object.entries(CATEGORY_VOLUME).map(([key,d])=>({
+            n: d.name || key,
+            icon: getIcon(d.name || key),
+            volume: d.volume || 0,
+            count: d.markets || 0
+        })).sort((a,b)=>b.volume-a.volume);
+    } else {
+        // 从API获取的分类数据
+        cats = Object.entries(S.catStats||{}).filter(([n,d])=>d.count>0).map(([n,d])=>({n,icon:getIcon(n),...d})).sort((a,b)=>b.volume-a.volume);
+    }
+    
+    const totalCatVolume = cats.reduce((s,c)=>s+c.volume,0) || S.totalVolume || 1;
+    const totalCatMarkets = cats.reduce((s,c)=>s+c.count,0) || S.totalMarkets || 1;
+    
+    document.getElementById('overview').innerHTML=`
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-label">历史总交易量</div><div class="stat-value">${fmtUSD(P.totalVolume)}</div><div class="stat-sub">累计交易额</div></div>
+            <div class="stat-card purple"><div class="stat-label">历史总用户数</div><div class="stat-value">${fmt(P.totalUsers)}</div><div class="stat-sub">唯一钱包</div></div>
+            <div class="stat-card green"><div class="stat-label">总交易笔数</div><div class="stat-value">${fmt(P.totalTrades)}</div><div class="stat-sub">历史交易次数</div></div>
+            <div class="stat-card orange"><div class="stat-label">24小时成交量</div><div class="stat-value">${fmtUSD(P.volume24h)}</div><div class="stat-sub">过去24小时</div></div>
+            <div class="stat-card pink"><div class="stat-label">平台总价值 (TPV)</div><div class="stat-value">${fmtUSD(P.tpv)}</div><div class="stat-sub">Protocol+Proxies</div></div>
+            <div class="stat-card blue"><div class="stat-label">平台最新TVL</div><div class="stat-value">${fmtUSD(tvl)}</div><div class="stat-sub">实时更新 ${tvlChange>=0?'↑':'↓'}${Math.abs(tvlChange).toFixed(1)}%</div></div>
+            <div class="stat-card"><div class="stat-label">活跃市场数</div><div class="stat-value">${fmt(S.activeMarkets)}</div><div class="stat-sub">进行中</div></div>
+            <div class="stat-card purple"><div class="stat-label">LP奖励累计</div><div class="stat-value">${fmtUSD(LP.cumulative)}</div><div class="stat-sub">流动性奖励</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
+            <div class="section"><div class="section-title">📊 成交量类别分布</div><div class="bar-chart">${renderBar(cats.map(d=>({l:`${d.icon} ${d.n}`,v:fmtUSD(d.volume),p:d.volume/totalCatVolume*100})))}</div></div>
+            <div class="section"><div class="section-title">💰 用户成交额统计占比</div><div class="bar-chart">${renderBar(VOL_DIST.map(d=>({l:d.r,v:fmt(d.u),p:d.p})))}</div><div style="font-size:9px;color:#6b7280;margin-top:6px">*各用户群组数量(每位用户总投注额)</div></div>
+            <div class="section"><div class="section-title">🎯 市场数量分布</div><div class="bar-chart">${renderBar(cats.map(d=>({l:`${d.icon} ${d.n}`,v:fmt(d.count),p:d.count/totalCatMarkets*100})))}</div></div>
+            <div class="section"><div class="section-title">🏦 用户余额TVL分布</div><div class="bar-chart">${renderBar(TVL_DIST.map(d=>({l:d.r,v:fmt(d.u),p:d.p})))}</div><div style="font-size:9px;color:#6b7280;margin-top:6px">*基于TVL ${fmtUSD(tvl)}</div></div>
+        </div>
+        <div class="section"><div class="section-title">📈 交易统计详情</div><div class="h-stats">
+            <div class="h-stat"><div class="h-stat-label">平均每笔</div><div class="h-stat-value">${fmtUSD(Math.round(P.totalVolume/P.totalTrades))}</div></div>
+            <div class="h-stat"><div class="h-stat-label">中位数</div><div class="h-stat-value">$85</div></div>
+            <div class="h-stat"><div class="h-stat-label">人均成交量</div><div class="h-stat-value">${fmtUSD(Math.round(P.totalVolume/P.totalUsers))}</div></div>
+            <div class="h-stat"><div class="h-stat-label">人均交易次数</div><div class="h-stat-value">${(P.totalTrades/P.totalUsers).toFixed(1)}</div></div>
+            <div class="h-stat"><div class="h-stat-label">人均持仓</div><div class="h-stat-value">${fmtUSD(Math.round(tvl/(P.totalUsers-TVL_DIST[0].u)))}</div></div>
+            <div class="h-stat"><div class="h-stat-label">人均余额</div><div class="h-stat-value">${fmtUSD(Math.round(tvl/P.totalUsers))}</div></div>
+            <div class="h-stat"><div class="h-stat-label">月活用户</div><div class="h-stat-value">${fmt(P.monthlyActive)}</div></div>
+            <div class="h-stat"><div class="h-stat-label">30天活跃率</div><div class="h-stat-value">${fmtPct(P.monthlyActive/P.totalUsers*100)}</div></div>
+        </div></div>`;
+}
+
+function renderMarkets(){
+    const cats=['Politics','Crypto','Sports','Business','Science','Entertainment','Other'];
+    document.getElementById('markets').innerHTML=`
+        <div class="filters"><div class="filters-grid">
+            <div class="filter-group"><label>类型</label><select id="f-cat" onchange="filterMkt()"><option value="">全部</option>${cats.map(c=>`<option value="${c}">${getIcon(c)} ${c}</option>`).join('')}</select></div>
+            <div class="filter-group"><label>状态</label><select id="f-status" onchange="filterMkt()"><option value="">全部</option><option value="active">进行中</option><option value="closed">已结算</option></select></div>
+            <div class="filter-group"><label>排序</label><select id="f-sort" onchange="filterMkt()"><option value="v24">24h成交↓</option><option value="vol">总成交↓</option><option value="liq">流动性↓</option><option value="spread-">磨损最高</option><option value="spread+">磨损最低</option><option value="end+">最快结束</option><option value="end-">最晚结束</option></select></div>
+            <div class="filter-group"><label>最低流动性</label><select id="f-liq" onchange="filterMkt()"><option value="0">全部</option><option value="1000">$1K+</option><option value="5000">$5K+</option><option value="10000">$10K+</option><option value="100000">$100K+</option></select></div>
+            <div class="filter-group"><label>磨损</label><select id="f-spread" onchange="filterMkt()"><option value="">全部</option><option value="arb">套利(<0)</option><option value="low">低(<3%)</option><option value="high">高(>7%)</option></select></div>
+            <div class="filter-group"><label>搜索</label><input id="f-search" placeholder="关键词..." oninput="filterMkt()"></div>
+        </div></div>
+        <div class="results-info"><div class="results-count">找到 <span id="mkt-cnt">0</span> 个市场</div><div style="display:flex;gap:8px;align-items:center"><select id="refresh-interval" onchange="changeRefreshInterval()" style="background:#1f2937;border:1px solid #374151;border-radius:5px;padding:5px 8px;color:#9ca3af;font-size:10px"><option value="30000">30秒刷新</option><option value="60000" selected>60秒刷新</option><option value="300000">5分钟刷新</option><option value="0">手动刷新</option></select><button class="refresh-btn" onclick="loadData()">🔄 立即刷新</button></div></div>
+        <div class="table-container"><div class="table-scroll"><table><thead><tr><th>#</th><th>市场</th><th>类型</th><th>状态</th><th class="right">YES</th><th class="right">NO</th><th class="right">合计</th><th class="right">磨损</th><th class="right">流动性</th><th class="right">24H成交</th><th class="right">总成交</th><th class="right">结束</th></tr></thead><tbody id="mkt-body"></tbody></table></div></div>
+        <div class="pagination" id="pag"></div>`;
+    filterMkt();
+}
+
+function getUrl(m){
+    if(m.slug)return`https://polymarket.com/event/${m.slug}`;
+    if(m.id)return`https://polymarket.com/market/${m.id}`;
+    return`https://polymarket.com/markets?_q=${encodeURIComponent(m.title.substring(0,30))}`;
+}
+
+function filterMkt(){
+    const cat=document.getElementById('f-cat').value,status=document.getElementById('f-status').value,sort=document.getElementById('f-sort').value,minLiq=+document.getElementById('f-liq').value,spread=document.getElementById('f-spread').value,search=document.getElementById('f-search').value.toLowerCase();
+    filteredMarkets=allMarkets.filter(m=>{
+        if(cat&&m.category!==cat)return false;
+        if(status==='active'&&!m.active)return false;
+        if(status==='closed'&&m.active)return false;
+        if(m.liquidity<minLiq)return false;
+        if(spread==='arb'&&m.spread>=0)return false;
+        if(spread==='low'&&m.spread>=3)return false;
+        if(spread==='high'&&m.spread<7)return false;
+        if(search&&!m.title.toLowerCase().includes(search))return false;
+        return true;
+    });
+    if(sort==='v24')filteredMarkets.sort((a,b)=>b.volume24h-a.volume24h);
+    else if(sort==='vol')filteredMarkets.sort((a,b)=>b.volume-a.volume);
+    else if(sort==='liq')filteredMarkets.sort((a,b)=>b.liquidity-a.liquidity);
+    else if(sort==='spread-')filteredMarkets.sort((a,b)=>b.spread-a.spread);
+    else if(sort==='spread+')filteredMarkets.sort((a,b)=>a.spread-b.spread);
+    else if(sort==='end+')filteredMarkets.sort((a,b)=>new Date(a.endDate||'2099')-new Date(b.endDate||'2099'));
+    else if(sort==='end-')filteredMarkets.sort((a,b)=>new Date(b.endDate||'2000')-new Date(a.endDate||'2000'));
+    page=1;renderTable();
+}
+
+function renderTable(){
+    const start=(page-1)*pageSize,rows=filteredMarkets.slice(start,start+pageSize);
+    document.getElementById('mkt-body').innerHTML=rows.map((m,i)=>{
+        const sc=m.spread<0?'profit':m.spread<1?'zero':m.spread<5?'low':'high';
+        return`<tr><td style="color:#6b7280">${start+i+1}</td><td><div class="market-title"><span class="market-icon">${getIcon(m.category)}</span><a href="${getUrl(m)}" target="_blank" class="market-name" title="${m.title}">${m.title}</a></div></td><td><span class="cat-tag ${m.category}">${m.category}</span></td><td><span class="status-tag ${m.active?'active':'ended'}">${m.active?'进行中':'已结算'}</span></td><td class="mono">${fmtPct(m.priceYes)}</td><td class="mono">${fmtPct(m.priceNo)}</td><td class="mono">${fmtPct(m.totalPrice)}</td><td class="mono"><span class="spread ${sc}">${m.spread>=0?'+':''}${fmtPct(m.spread,2)}</span></td><td class="mono">${fmtUSD(m.liquidity)}</td><td class="mono">${fmtUSD(m.volume24h)}</td><td class="mono">${fmtUSD(m.volume)}</td><td style="color:#9ca3af;font-size:9px">${fmtDate(m.endDate)}</td></tr>`;
+    }).join('')||'<tr><td colspan="12" style="text-align:center;padding:20px;color:#6b7280">无数据</td></tr>';
+    document.getElementById('mkt-cnt').textContent=filteredMarkets.length;
+    const total=Math.ceil(filteredMarkets.length/pageSize);
+    if(total<=1){document.getElementById('pag').innerHTML='';return;}
+    let h=`<button ${page===1?'disabled':''} onclick="goPage(${page-1})">上一页</button>`;
+    for(let i=Math.max(1,page-3);i<=Math.min(total,page+3);i++)h+=`<button class="${page===i?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    h+=`<button ${page===total?'disabled':''} onclick="goPage(${page+1})">下一页</button>`;
+    document.getElementById('pag').innerHTML=h;
+}
+function goPage(p){page=p;renderTable();}
+
+function renderLPRewards(){
+    document.getElementById('lprewards').innerHTML=`
+        <div class="stats-grid">
+            <div class="stat-card green"><div class="stat-label">每日LP奖励</div><div class="stat-value">${fmtUSD(LP.daily)}</div><div class="stat-sub">Daily USDC</div></div>
+            <div class="stat-card blue"><div class="stat-label">每周LP奖励</div><div class="stat-value">${fmtUSD(LP.weekly)}</div><div class="stat-sub">Weekly USDC</div></div>
+            <div class="stat-card purple"><div class="stat-label">每月LP奖励</div><div class="stat-value">${fmtUSD(LP.monthly)}</div><div class="stat-sub">Monthly USDC</div></div>
+            <div class="stat-card orange"><div class="stat-label">历史累计LP奖励</div><div class="stat-value">${fmtUSD(LP.cumulative)}</div><div class="stat-sub">自2022年2月起</div></div>
+        </div>
+        <div class="section"><div class="section-title">🏆 流动性提供者收益排行榜</div>
+            <div style="overflow-x:auto"><table class="lp-table"><thead><tr><th>排名</th><th>钱包地址</th><th>累计收益(USDC)</th><th>操作</th></tr></thead>
+            <tbody>${LP.leaderboard.map(lp=>`<tr><td><span class="lp-rank">#${lp.rank}</span></td><td><a href="https://polymarket.com/profile/${lp.address}" target="_blank" class="lp-address">${lp.address}</a></td><td style="color:#10b981;font-family:monospace">${fmtUSD(lp.usdc)}</td><td><a href="https://polymarket.com/profile/${lp.address}" target="_blank" style="color:#06b6d4;font-size:10px">查看主页↗</a></td></tr>`).join('')}</tbody></table></div>
+            <div style="margin-top:15px;padding:12px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2);border-radius:8px">
+                <div style="font-size:12px;color:#06b6d4;margin-bottom:8px">💡 如何成为LP?</div>
+                <div style="font-size:10px;color:#9ca3af;line-height:1.6">1. 存入USDC → 2. 设置限价单 → 3. 保持订单在mid±3¢内 → 4. 每日UTC 00:00自动分发</div>
+            </div>
+        </div>
+        <div class="section"><div class="section-title">📊 LP奖励规则</div><div class="h-stats">
+            <div class="h-stat"><div class="h-stat-label">最小订单</div><div class="h-stat-value">100 shares</div></div>
+            <div class="h-stat"><div class="h-stat-label">最大spread</div><div class="h-stat-value">3¢</div></div>
+            <div class="h-stat"><div class="h-stat-label">分发时间</div><div class="h-stat-value">UTC 00:00</div></div>
+            <div class="h-stat"><div class="h-stat-label">奖励币种</div><div class="h-stat-value">USDC</div></div>
+            <div class="h-stat"><div class="h-stat-label">网络</div><div class="h-stat-value">Polygon</div></div>
+            <div class="h-stat"><div class="h-stat-label">计分</div><div class="h-stat-value">Q-Score</div></div>
+        </div></div>`;
+}
+
+function renderUsers(){
+    document.getElementById('users').innerHTML=`
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-label">历史总用户</div><div class="stat-value">${fmt(P.totalUsers)}</div></div>
+            <div class="stat-card orange"><div class="stat-label">月活用户</div><div class="stat-value">${fmt(P.monthlyActive)}</div></div>
+            <div class="stat-card green"><div class="stat-label">周活用户</div><div class="stat-value">${fmt(P.weeklyActive)}</div></div>
+            <div class="stat-card purple"><div class="stat-label">日活用户</div><div class="stat-value">${fmt(P.dailyActive)}</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
+            <div class="section"><div class="section-title">🎲 下注次数分布</div><div class="bar-chart">${renderBar(U.betDist.map(d=>({l:d.r,v:fmt(Math.floor(P.totalUsers*d.p/100)),p:d.p})))}</div></div>
+            <div class="section"><div class="section-title">📅 活跃天数分布</div><div class="bar-chart">${renderBar(U.daysDist.map(d=>({l:d.r,v:fmt(Math.floor(P.totalUsers*d.p/100)),p:d.p})))}</div></div>
+            <div class="section"><div class="section-title">💼 持仓金额分布</div><div class="bar-chart">${renderBar(U.positionDist.map(d=>({l:d.r,v:fmt(Math.floor(P.totalUsers*d.p/100)),p:d.p})))}</div></div>
+            <div class="section"><div class="section-title">📊 盈亏分布(87%亏损)</div><div class="bar-chart">${renderBar(U.pnlDist.map(d=>({l:d.r,v:fmt(Math.floor(P.totalUsers*d.p/100)),p:d.p,c:d.c})),36)}</div></div>
+            <div class="section"><div class="section-title">🏦 用户余额TVL分布</div><div class="bar-chart">${renderBar(TVL_DIST.map(d=>({l:d.r,v:fmt(d.u),p:d.p})))}</div><div style="font-size:9px;color:#6b7280;margin-top:6px">*基于TVL ${fmtUSD(P.tvl)}</div></div>
+            <div class="section"><div class="section-title">📊 关键指标</div><div class="h-stats">
+                <div class="h-stat"><div class="h-stat-label">人均成交量</div><div class="h-stat-value">${fmtUSD(Math.round(P.totalVolume/P.totalUsers))}</div></div>
+                <div class="h-stat"><div class="h-stat-label">人均交易次数</div><div class="h-stat-value">${(P.totalTrades/P.totalUsers).toFixed(1)}</div></div>
+                <div class="h-stat"><div class="h-stat-label">人均持仓</div><div class="h-stat-value">${fmtUSD(Math.round(P.tvl/(P.totalUsers-TVL_DIST[0].u)))}</div></div>
+                <div class="h-stat"><div class="h-stat-label">盈利用户</div><div class="h-stat-value red">12.7%</div></div>
+                <div class="h-stat"><div class="h-stat-label">亏损用户</div><div class="h-stat-value red">87.3%</div></div>
+            </div></div>
+        </div>`;
+}
+
+function renderAddress(){
+    document.getElementById('address').innerHTML=`
+        <div class="lookup-container">
+            <div class="section-title">🔍 地址查询</div>
+            <div class="lookup-form">
+                <input class="lookup-input" id="addr-input" placeholder="输入钱包地址 (0x...)" onkeypress="if(event.key==='Enter')lookup()">
+                <button class="lookup-btn" id="lookup-btn" onclick="lookup()">查询</button>
+            </div>
+            <div class="info-box info" id="lookup-info">输入地址后从Polymarket API获取完整数据<br><small style="color:#6b7280">⚠️ 大账户（2万+交易）需要Vercel Pro支持60秒超时，否则可能只能获取部分数据</small></div>
+            <div id="lookup-result"></div>
+        </div>`;
+}
+
+async function lookup(){
+    const addr=document.getElementById('addr-input').value.trim();
+    const info=document.getElementById('lookup-info');
+    const btn=document.getElementById('lookup-btn');
+    if(!addr.match(/^0x[a-fA-F0-9]{40}$/i)){info.className='info-box warning';info.innerHTML='❌ 请输入有效地址';return;}
+    btn.disabled=true;btn.innerHTML='<span class="spin"></span>查询中...';
+    info.innerHTML='⏳ 正在获取完整数据（大账户可能需要30-60秒）...';info.className='info-box info';
+    
+    const startTime=Date.now();
+    try{
+        const res=await fetch(`/api/lookup?address=${addr}`);
+        const elapsed=((Date.now()-startTime)/1000).toFixed(1);
+        const data=await res.json();
+        if(data.success){
+            const s=data.stats;
+            info.className='info-box success';
+            info.innerHTML=`✅ 找到 ${fmt(s.positionCount)} 个持仓，${fmt(s.totalTrades)} 条交易记录 (耗时${elapsed}秒)`;
+            document.getElementById('lookup-result').innerHTML=`
+                <div class="user-header">
+                    <span class="user-avatar">👤</span>
+                    <div style="flex:1"><div style="color:#9ca3af;font-size:9px">钱包地址</div><div class="user-address">${addr}</div></div>
+                    <div class="user-links"><a href="https://polymarket.com/profile/${addr}" target="_blank">Polymarket↗</a><a href="https://polygonscan.com/address/${addr}" target="_blank">Polygonscan↗</a></div>
+                </div>
+                <div class="user-stats-grid">
+                    <div class="user-stat-card"><div class="user-stat-label">USDC余额</div><div class="user-stat-value" style="color:#10b981">${s.usdcBalance>0?fmtUSD(s.usdcBalance):'$0'}</div></div>
+                    <div class="user-stat-card"><div class="user-stat-label">Portfolio价值</div><div class="user-stat-value" style="color:#06b6d4">${fmtUSD(s.portfolioValue)}</div></div>
+                    <div class="user-stat-card"><div class="user-stat-label">投入金额</div><div class="user-stat-value">${fmtUSD(s.investedAmount)}</div></div>
+                    <div class="user-stat-card"><div class="user-stat-label">未实现盈亏</div><div class="user-stat-value" style="color:${s.unrealizedPnl>=0?'#10b981':'#ef4444'}">${s.unrealizedPnl>=0?'+':''}${fmtUSD(s.unrealizedPnl)}</div></div>
+                    <div class="user-stat-card"><div class="user-stat-label">已实现盈亏</div><div class="user-stat-value" style="color:${s.realizedPnl>=0?'#10b981':'#ef4444'}">${s.realizedPnl>=0?'+':''}${fmtUSD(s.realizedPnl)}</div></div>
+                    <div class="user-stat-card"><div class="user-stat-label">总成交量</div><div class="user-stat-value" style="color:#8b5cf6">${fmtUSD(s.totalVolume)}</div></div>
+                </div>
+                <div class="section"><div class="section-title">📊 交易统计</div><div class="h-stats">
+                    <div class="h-stat"><div class="h-stat-label">总交易</div><div class="h-stat-value">${fmt(s.totalTrades)}</div></div>
+                    <div class="h-stat"><div class="h-stat-label">买入</div><div class="h-stat-value green">${fmt(s.buyCount)}</div></div>
+                    <div class="h-stat"><div class="h-stat-label">卖出</div><div class="h-stat-value red">${fmt(s.sellCount)}</div></div>
+                    <div class="h-stat"><div class="h-stat-label">买入额</div><div class="h-stat-value">${fmtUSD(s.totalBuyVolume)}</div></div>
+                    <div class="h-stat"><div class="h-stat-label">卖出额</div><div class="h-stat-value">${fmtUSD(s.totalSellVolume)}</div></div>
+                    <div class="h-stat"><div class="h-stat-label">市场数</div><div class="h-stat-value">${s.marketsParticipated}</div></div>
+                    <div class="h-stat"><div class="h-stat-label">活跃天数</div><div class="h-stat-value">${s.activeDays||0}</div></div>
+                    <div class="h-stat"><div class="h-stat-label">胜率</div><div class="h-stat-value">${s.winRate||0}%</div></div>
+                </div></div>
+                <div class="section"><div class="section-title">💼 持仓统计</div><div class="h-stats">
+                    <div class="h-stat"><div class="h-stat-label">持仓数</div><div class="h-stat-value">${s.positionCount}</div></div>
+                    <div class="h-stat"><div class="h-stat-label">盈利标的</div><div class="h-stat-value green">${s.winningPositions}</div></div>
+                    <div class="h-stat"><div class="h-stat-label">亏损标的</div><div class="h-stat-value red">${s.losingPositions}</div></div>
+                    <div class="h-stat"><div class="h-stat-label">首次交易</div><div class="h-stat-value" style="font-size:9px">${s.firstTradeDate?fmtDate(s.firstTradeDate):'-'}</div></div>
+                    <div class="h-stat"><div class="h-stat-label">最后交易</div><div class="h-stat-value" style="font-size:9px">${s.lastTradeDate?fmtDate(s.lastTradeDate):'-'}</div></div>
+                </div></div>
+                ${data.positions&&data.positions.length?`<div class="history-section"><div class="history-title"><span>📋 持仓明细 (共${s.positionCount}个)</span></div>${data.positions.map(p=>{
+                    const curr=parseFloat(p.currentValue)||parseFloat(p.value)||0;
+                    const init=parseFloat(p.initialValue)||parseFloat(p.cost)||0;
+                    const pnlPct=init>0?((curr-init)/init*100).toFixed(1):'0';
+                    return`<div class="position-item"><span class="position-outcome ${(p.outcome||'Yes').toLowerCase()}">${p.outcome||'Yes'}</span><span class="position-market">${p.title||p.marketSlug||'Unknown'}</span><div class="position-data"><span class="position-val">投入${fmtUSD(init)}</span><span class="position-val">现值${fmtUSD(curr)}</span><span class="position-val" style="color:${curr>=init?'#10b981':'#ef4444'}">${curr>=init?'+':''}${pnlPct}%</span></div></div>`;
+                }).join('')}</div>`:''}
+                ${data.history&&data.history.length?`<div class="history-section"><div class="history-title"><span>📜 交易历史 (显示最近500条，共${s.totalTrades}条)</span></div>${data.history.map(h=>`<div class="history-item"><span class="history-type ${h.type}">${h.type==='buy'?'买入':h.type==='sell'?'卖出':'交易'}</span><span class="history-market">${h.market||'Unknown'}</span><span class="history-amount">${fmtUSD(h.amount||0)}</span><span class="history-date">${h.timestamp?fmtTime(h.timestamp):''}</span></div>`).join('')}</div>`:''}`;
+        }else throw new Error(data.error||'查询失败');
+    }catch(e){
+        info.className='info-box warning';
+        info.innerHTML=`❌ ${e.message}<br><a href="https://polymarket.com/profile/${addr}" target="_blank">在Polymarket查看↗</a>`;
+    }
+    btn.disabled=false;btn.textContent='查询';
+}
+
+function showTab(id){
+    document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+}
+
+// 自动刷新设置
+let autoRefreshInterval = null;
+const AUTO_REFRESH_MS = 60000; // 默认60秒刷新一次
+
+function startAutoRefresh(ms = AUTO_REFRESH_MS) {
+    stopAutoRefresh();
+    autoRefreshInterval = setInterval(() => {
+        console.log('自动刷新数据...', new Date().toLocaleTimeString());
+        loadData(true); // true = 静默刷新，不显示loading
+    }, ms);
+    updateRefreshStatus(ms);
+}
+
+function stopAutoRefresh() {
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+        autoRefreshInterval = null;
+    }
+}
+
+function updateRefreshStatus(ms) {
+    const statusText = document.getElementById('status-text');
+    if (!statusText) return;
+    const sec = ms / 1000;
+    if (ms === 0) {
+        statusText.textContent = '手动刷新模式';
+    } else {
+        statusText.textContent = `自动刷新: ${sec}秒`;
+    }
+}
+
+function changeRefreshInterval() {
+    const el = document.getElementById('refresh-interval');
+    if (!el) return;
+    const ms = parseInt(el.value);
+    if (ms === 0) {
+        stopAutoRefresh();
+        const statusText = document.getElementById('status-text');
+        if (statusText) statusText.textContent = '手动刷新模式';
+    } else {
+        startAutoRefresh(ms);
+    }
+}
+
+// 页面加载时启动
+document.addEventListener('DOMContentLoaded', () => {
+    loadData();
+    startAutoRefresh(60000); // 每60秒自动刷新
+});
+
+// 页面可见性变化时处理
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        stopAutoRefresh(); // 页面隐藏时停止刷新
+    } else {
+        loadData(true); // 页面恢复时立即刷新
+        startAutoRefresh(60000);
+    }
+});
+</script>
+</body>
+</html>
